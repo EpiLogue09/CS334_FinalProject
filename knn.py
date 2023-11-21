@@ -7,36 +7,9 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 #knn
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
+from sklearn.metrics import roc_curve, auc
 
-def knn(x, y, k):
-    # Create KNN classifier
-    knn = KNeighborsClassifier(n_neighbors = k)
-    # Fit the classifier to the data
-    knn.fit(x, y)
-    #show first 5 model predictions on the test data
-    #print(knn.predict(x_test)[0:5])
-    #check accuracy of our model on the test data
-    #accuracy = knn.score(x_test, y_test)
-    #print(accuracy)
-    # Create a new KNN model
-    knn_cv = KNeighborsClassifier(n_neighbors=k)
-    # Fit model to the data
-    knn_cv.fit(x, y)
-    # Calculate the accuracy of the model
-    accuracy = cross_val_score(knn_cv, x, y, cv=10)
-    print(accuracy)
-    print("Accuracy: %0.2f (+/- %0.2f)" % (accuracy.mean(), accuracy.std() * 2))
-
-    return accuracy
-
-def main():
-    # Read the datasets
-    x_features = pd.read_csv('normalized_x_features.csv')
-    y_target = pd.read_csv('y_target_binary.csv')
-    y_target = y_target.iloc[:, 0]
-    x_features = np.ascontiguousarray(x_features)
-    y_target = np.ascontiguousarray(y_target)
-
+def knn_plot(x_features, y_target):
     # Run KNN with 10-fold cross-validation
     kf = KFold(n_splits=10, shuffle=True, random_state=334)
 
@@ -60,6 +33,39 @@ def main():
     plt.grid(True)
     plt.savefig('knn.png')
     plt.show()
+
+    return accuracy_scores
+
+def main():
+    # Read the datasets
+    x_features = pd.read_csv('normalized_x_features.csv')
+    y_target = pd.read_csv('y_target_binary.csv')
+    y_target = y_target.iloc[:, 0]
+    x_features = np.ascontiguousarray(x_features)
+    y_target = np.ascontiguousarray(y_target)
+
+    # Run KNN with 10-fold cross-validation
+    knn_plot(x_features, y_target)
+
+    #evaluate knn model using the best k value (k=1)
+    knn = KNeighborsClassifier(n_neighbors=1, metric="euclidean")
+    knn.fit(x_features, y_target)
+    y_pred = knn.predict(x_features)
+    # Calculate the accuracy of the model
+    accuracy = accuracy_score(y_target, y_pred)
+    print('Accuracy: ', accuracy)
+    # Calculate the confusion matrix
+    cm = confusion_matrix(y_target, y_pred)
+    print('Confusion Matrix: \n', cm)
+    # Calculate the ROC curve
+    fpr, tpr, thresholds = roc_curve(y_target, y_pred)
+    # Calculate the AUC
+    auc = roc_auc_score(y_target, y_pred)
+
+    #Confusion Matrix plotting
+
+    #TODO: Model Evaluation
+
 
 #hyperparameter: k=1
 if __name__ == '__main__':
