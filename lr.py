@@ -2,10 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import Ridge
-from sklearn.model_selection import KFold
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import KFold
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, f1_score, roc_auc_score, roc_curve
 
 #function to run linear regression with 10-fold cross-validation
 #we don't need to do any regularization here
@@ -143,6 +142,7 @@ def main():
     plt.savefig('lr_residuals_ridge.png')
     plt.show()
 
+    
 
 #hyperparameter: alpha=500 (for both MSE and R^2)
 if __name__ == "__main__":
