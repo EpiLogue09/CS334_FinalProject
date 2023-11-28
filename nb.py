@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score, roc_auc_score
+from sklearn.metrics import accuracy_score, roc_auc_score, f1_score
 
 # Load the datasets
 x_features = pd.read_csv('normalized_x_features.csv')
@@ -23,15 +23,15 @@ for var_smoothing in var_smoothing_list:
 
     # Predictions on the test set
     y_pred_nb = nb_classifier.predict(X_test)
-    y_pred_proba_nb = nb_classifier.predict_proba(X_test)[:, 1] # probabilities for the positive class
+    y_pred_proba_nb = nb_classifier.predict_proba(X_test)[:, 1] # Probabilities for the positive class
 
-    # Calculate accuracies
+    # Calculate accuracies and AUROC
     accuracy_nb = accuracy_score(y_test, y_pred_nb)
-
-    # Calculate AUROC
     auroc_nb = roc_auc_score(y_test, y_pred_proba_nb)
+    f1_score_nb = f1_score(y_test, y_pred_nb)  # Calculate F1 score
 
     # Print the results
     print(f"Naive Bayes Classifier with var_smoothing={var_smoothing} ---------------")
     print("Test Accuracy:", accuracy_nb)
     print("AUROC:", auroc_nb)
+    print("F1 Score:", f1_score_nb)
