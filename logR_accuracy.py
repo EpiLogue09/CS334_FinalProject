@@ -41,7 +41,7 @@ def main():
     plt.ylim([0.0, 1.0])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
-    plt.title('ROC Curve')
+    plt.title('ROC Curve (Logistic)')
     plt.legend(loc="lower right")
     plt.savefig('logistic_roc.png')
     plt.show()

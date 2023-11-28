@@ -2,10 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import Ridge
-from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import KFold
-from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, f1_score, roc_auc_score, roc_curve
-from lr import lr, lr_ridge
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, roc_curve
+
 def main():
     # Read the datasets
     x_features = pd.read_csv('normalized_x_features.csv')
@@ -15,42 +14,57 @@ def main():
     y_target['PM_Median'] = (y_target['PM_Median'] > 75).astype(int)
     y_target = y_target.iloc[:, 0]
 
+    # 10-fold cross-validation setup
+    kf = KFold(n_splits=10, shuffle=True, random_state=334)
+
+    # Lists to store the metrics
+    accuracies, f1_scores, auc_rocs = [], [], []
+
     # Selecting the optimal hyperparameter: alpha=500
     optimal_alpha = 500
 
-    # Creating the Ridge model with the optimal alpha
-    model = Ridge(alpha=optimal_alpha)
-    model.fit(x_features, y_target)
-    y_pred_scores = model.predict(x_features)
+    for train_index, test_index in kf.split(x_features):
+        X_train, X_test = x_features.iloc[train_index], x_features.iloc[test_index]
+        y_train, y_test = y_target.iloc[train_index], y_target.iloc[test_index]
 
-    # Threshold for classification
-    threshold = 0.5
-    y_pred_binary = (y_pred_scores > threshold).astype(int)
+        # Creating the Ridge model with the optimal alpha and fitting it
+        model = Ridge(alpha=optimal_alpha)
+        model.fit(X_train, y_train)
 
-    # Calculating accuracy, F-1 score, and AUC-ROC
-    accuracy = accuracy_score(y_target, y_pred_binary)
-    f1 = f1_score(y_target, y_pred_binary)
-    auc_roc = roc_auc_score(y_target, y_pred_scores)
+        # Predicting and scoring
+        y_pred_scores = model.predict(X_test)
+        threshold = 0.5
+        y_pred_binary = (y_pred_scores > threshold).astype(int)
 
-    print('Accuracy:', accuracy)
-    print('F-1 Score:', f1)
-    print('AUC-ROC:', auc_roc)
+        # Calculating metrics
+        accuracies.append(accuracy_score(y_test, y_pred_binary))
+        f1_scores.append(f1_score(y_test, y_pred_binary))
+        auc_rocs.append(roc_auc_score(y_test, y_pred_scores))
 
-    # Plotting ROC Curve
-    fpr, tpr, _ = roc_curve(y_target, y_pred_scores)
+    # Calculating average of the metrics
+    avg_accuracy = np.mean(accuracies)
+    avg_f1 = np.mean(f1_scores)
+    avg_auc_roc = np.mean(auc_rocs)
+
+    print('Average Accuracy:', avg_accuracy)
+    print('Average F-1 Score:', avg_f1)
+    print('Average AUC-ROC:', avg_auc_roc)
+
+    # Plotting ROC Curve for the last fold
+    fpr, tpr, _ = roc_curve(y_test, y_pred_scores)
     plt.figure(figsize=(7, 5))
     plt.plot(fpr, tpr, color='blue', lw=2, label='ROC')
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
-    plt.title('ROC Curve')
+    plt.title('ROC Curve (LR-Ridge)')
     plt.legend(loc="lower right")
-    plt.savefig('ridge_roc.png')
+    plt.savefig('lr_roc.png')
     plt.show()
 
 """
-Accuracy: 0.7595133649178218
-F-1 Score: 0.6471940964475718
-AUC-ROC: 0.8158435288488035
+Average Accuracy: 0.7591391484679717
+Average F-1 Score: 0.6457939620387042
+Average AUC-ROC: 0.815432967680567
 """
 if __name__ == "__main__":
     main()
