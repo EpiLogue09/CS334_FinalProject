@@ -37,8 +37,6 @@ def main():
     fpr, tpr, _ = roc_curve(y_target, probabilities)
     plt.figure()
     plt.plot(fpr, tpr, label='ROC')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.0])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title('ROC Curve (Logistic)')

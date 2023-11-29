@@ -52,15 +52,14 @@ def main():
 
     # Plotting ROC Curve for the last fold
     fpr, tpr, _ = roc_curve(y_test, y_pred_scores)
-    plt.figure(figsize=(7, 5))
-    plt.plot(fpr, tpr, color='blue', lw=2, label='ROC')
+    plt.figure()
+    plt.plot(fpr, tpr, label='ROC')
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title('ROC Curve (LR-Ridge)')
     plt.legend(loc="lower right")
     plt.savefig('lr_roc.png')
     plt.show()
-
 """
 Average Accuracy: 0.7591391484679717
 Average F-1 Score: 0.6457939620387042

@@ -15,9 +15,6 @@ def knn_plotROC(x_features, y_target):
 
     plt.figure()
     plt.plot(fpr, tpr, label='ROC curve')
-    #plt.plot([0, 1], [0, 1], 'k--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title('ROC Curve (kNN)')
